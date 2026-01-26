@@ -1,0 +1,70 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mrs-client"
+version = "0.5.0"
+description = "Mixed Reality Service client library and CLI - DNS for physical space"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "Mark D. Pesce", email = "mpesce@gmail.com" }
+]
+requires-python = ">=3.11"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet",
+    "Topic :: Scientific/Engineering :: GIS",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+keywords = ["mrs", "mixed-reality", "geospatial", "location", "spatial", "agents"]
+dependencies = [
+    "httpx>=0.26.0",
+    "cryptography>=41.0.0",
+    "click>=8.1.0",
+    "pydantic>=2.5.0",
+    "rich>=13.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.1.0",
+    "mypy>=1.7.0",
+]
+
+[project.scripts]
+mrs = "mrs_cli.main:cli"
+
+[project.urls]
+Homepage = "https://github.com/mpesce/mrs-client"
+Repository = "https://github.com/mpesce/mrs-client"
+Issues = "https://github.com/mpesce/mrs-client/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["mrs_client", "mrs_cli"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
