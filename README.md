@@ -7,10 +7,16 @@ MRS is like DNS for physical space: it maps coordinates to service URIs. This cl
 ## Installation
 
 ```bash
-pip install mrs-client
+# Install from GitHub
+pip install git+https://github.com/mpesce/mrs-client.git
+
+# Or clone and install locally
+git clone https://github.com/mpesce/mrs-client.git
+cd mrs-client
+pip install .
 ```
 
-Requires Python 3.11 or later.
+Requires Python 3.11 or later. See [INSTALL.md](INSTALL.md) for detailed platform-specific instructions.
 
 ## Quick Start
 
