@@ -1,6 +1,6 @@
 ---
 name: mrs-client-dev
-description: Work on the MRS client library/CLI: register/search/release flows, auth/signature handling, URI validation, and compatibility with mrs-server contracts. Use when changing client behavior, CLI UX, parsing, or safety controls.
+description: "Work on the MRS client library/CLI: register/search/release flows, auth/signature handling, URI validation, and compatibility with mrs-server contracts. Use when changing client behavior, CLI UX, parsing, or safety controls."
 ---
 
 # MRS Client Dev Skill
