@@ -17,15 +17,26 @@ If you see a version less than 3.11, you'll need to upgrade Python first.
 
 ## Installation Methods
 
-### Method 1: Install from PyPI (Recommended)
+### Method 1: Install from GitHub (Recommended right now)
 
-Once published to PyPI:
+```bash
+pip install git+https://github.com/mpesce/mrs-client.git
+```
+
+### Method 2: Install from source
+
+```bash
+git clone https://github.com/mpesce/mrs-client.git
+cd mrs-client
+pip install .
+```
+
+### Method 3: Install from PyPI (when published)
 
 ```bash
 pip install mrs-client
 ```
 
-### Method 2: Install from GitHub
 
 ```bash
 pip install git+https://github.com/mpesce/mrs-client.git
