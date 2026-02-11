@@ -67,7 +67,7 @@ class SearchEngine:
             SearchResult with deduplicated, sorted results
         """
         visited: set[str] = set()
-        all_results: dict[str, Registration] = {}  # id -> registration
+        all_results: dict[str, Registration] = {}  # dedupe_key -> registration
         queue: list[tuple[str, int]] = [
             (s, 0) for s in initial_servers
         ]  # (server, depth)
@@ -94,8 +94,8 @@ class SearchEngine:
 
                 # Collect results
                 for reg in response["results"]:
-                    reg_id = reg["id"]
                     registration = Registration.from_dict(reg)
+                    dedupe_key = self._dedupe_key(registration)
 
                     # Calculate distance if not provided
                     if registration.distance is None:
@@ -103,15 +103,11 @@ class SearchEngine:
                             location, registration.space.center
                         )
 
-                    if reg_id not in all_results:
-                        all_results[reg_id] = registration
-                    elif (
-                        registration.distance is not None
-                        and registration.distance
-                        < (all_results[reg_id].distance or float("inf"))
-                    ):
-                        # Keep the one with smaller distance if duplicate
-                        all_results[reg_id] = registration
+                    existing = all_results.get(dedupe_key)
+                    if existing is None:
+                        all_results[dedupe_key] = registration
+                    elif self._is_better(registration, existing):
+                        all_results[dedupe_key] = registration
 
                 # Queue referrals
                 for referral_data in response.get("referrals", []):
@@ -170,6 +166,24 @@ class SearchEngine:
             raise MRSFederationError(f"Server {server} returned non-JSON response")
 
         return response.json_data
+
+    def _dedupe_key(self, reg: Registration) -> str:
+        """Build dedupe key, preferring canonical federation identity when present."""
+        if reg.origin_server and reg.origin_id:
+            return f"{reg.origin_server.rstrip('/')}::{reg.origin_id}"
+        return reg.id
+
+    def _is_better(self, candidate: Registration, existing: Registration) -> bool:
+        """Select better duplicate candidate deterministically."""
+        if candidate.version != existing.version:
+            return candidate.version > existing.version
+
+        if candidate.updated != existing.updated:
+            return candidate.updated > existing.updated
+
+        cand_dist = candidate.distance if candidate.distance is not None else float("inf")
+        exist_dist = existing.distance if existing.distance is not None else float("inf")
+        return cand_dist < exist_dist
 
     def _sort_results(self, results: list[Registration]) -> list[Registration]:
         """Sort by volume (smallest first), then by distance."""
@@ -236,22 +250,19 @@ class SyncSearchEngine:
                 response = self._query_server(server, location, range_meters)
 
                 for reg in response["results"]:
-                    reg_id = reg["id"]
                     registration = Registration.from_dict(reg)
+                    dedupe_key = self._dedupe_key(registration)
 
                     if registration.distance is None:
                         registration.distance = haversine_distance(
                             location, registration.space.center
                         )
 
-                    if reg_id not in all_results:
-                        all_results[reg_id] = registration
-                    elif (
-                        registration.distance is not None
-                        and registration.distance
-                        < (all_results[reg_id].distance or float("inf"))
-                    ):
-                        all_results[reg_id] = registration
+                    existing = all_results.get(dedupe_key)
+                    if existing is None:
+                        all_results[dedupe_key] = registration
+                    elif self._is_better(registration, existing):
+                        all_results[dedupe_key] = registration
 
                 for referral_data in response.get("referrals", []):
                     referral = Referral.from_dict(referral_data)
@@ -297,6 +308,20 @@ class SyncSearchEngine:
             raise MRSFederationError(f"Server {server} returned non-JSON response")
 
         return response.json_data
+
+    def _dedupe_key(self, reg: Registration) -> str:
+        if reg.origin_server and reg.origin_id:
+            return f"{reg.origin_server.rstrip('/')}::{reg.origin_id}"
+        return reg.id
+
+    def _is_better(self, candidate: Registration, existing: Registration) -> bool:
+        if candidate.version != existing.version:
+            return candidate.version > existing.version
+        if candidate.updated != existing.updated:
+            return candidate.updated > existing.updated
+        cand_dist = candidate.distance if candidate.distance is not None else float("inf")
+        exist_dist = existing.distance if existing.distance is not None else float("inf")
+        return cand_dist < exist_dist
 
     def _sort_results(self, results: list[Registration]) -> list[Registration]:
         def sort_key(r: Registration) -> tuple[float, float]:

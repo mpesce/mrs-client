@@ -90,6 +90,9 @@ class Registration:
     owner: str
     created: datetime
     updated: datetime
+    origin_server: str | None = None
+    origin_id: str | None = None
+    version: int = 1
     service_point: str | None = None
     distance: float | None = None  # Populated in search results
 
@@ -102,7 +105,12 @@ class Registration:
             "owner": self.owner,
             "created": self.created.isoformat(),
             "updated": self.updated.isoformat(),
+            "version": self.version,
         }
+        if self.origin_server is not None:
+            result["origin_server"] = self.origin_server
+        if self.origin_id is not None:
+            result["origin_id"] = self.origin_id
         if self.service_point:
             result["service_point"] = self.service_point
         if self.distance is not None:
@@ -134,6 +142,9 @@ class Registration:
             owner=data["owner"],
             created=created,
             updated=updated,
+            origin_server=data.get("origin_server"),
+            origin_id=data.get("origin_id"),
+            version=int(data.get("version", 1)),
             distance=data.get("distance"),
         )
 
