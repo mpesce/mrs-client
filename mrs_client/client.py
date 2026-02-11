@@ -25,6 +25,7 @@ from mrs_client.models import (
     Sphere,
 )
 from mrs_client.search import SearchEngine, SyncSearchEngine
+from mrs_client.validation import validate_service_point_uri
 
 
 class MRSClient:
@@ -200,6 +201,11 @@ class MRSClient:
             raise MRSValidationError(
                 "service_point is required when foad is False"
             )
+        if service_point is not None:
+            try:
+                service_point = validate_service_point_uri(service_point)
+            except ValueError as e:
+                raise MRSValidationError(f"Invalid service_point URI: {e}") from e
 
         space = Sphere(center=Location(lat=lat, lon=lon, ele=ele), radius=radius)
         server_url = self._get_server(server)
@@ -428,6 +434,11 @@ class MRSClient:
             raise MRSValidationError(
                 "service_point is required when foad is False"
             )
+        if service_point is not None:
+            try:
+                service_point = validate_service_point_uri(service_point)
+            except ValueError as e:
+                raise MRSValidationError(f"Invalid service_point URI: {e}") from e
 
         space = Sphere(center=Location(lat=lat, lon=lon, ele=ele), radius=radius)
         server_url = self._get_server(server)

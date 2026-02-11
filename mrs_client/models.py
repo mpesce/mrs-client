@@ -7,6 +7,8 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
 
+from mrs_client.validation import sanitize_service_point_uri
+
 
 @dataclass
 class Location:
@@ -127,7 +129,7 @@ class Registration:
         return cls(
             id=data["id"],
             space=space,
-            service_point=data.get("service_point"),
+            service_point=sanitize_service_point_uri(data.get("service_point")),
             foad=bool(data.get("foad", False)),
             owner=data["owner"],
             created=created,
