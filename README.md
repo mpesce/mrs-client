@@ -18,6 +18,17 @@ pip install .
 
 Requires Python 3.11 or later. See [INSTALL.md](INSTALL.md) for detailed platform-specific instructions.
 
+## 90-Second Setup
+
+```bash
+git clone https://github.com/mpesce/mrs-client.git
+cd mrs-client
+./scripts/bootstrap.sh
+./scripts/verify.sh
+```
+
+For a short walkthrough, see [QUICKSTART.md](QUICKSTART.md).
+
 ## Quick Start
 
 ### CLI Usage
