@@ -1,5 +1,7 @@
 """Tests for geospatial utilities."""
 
+import math
+
 import pytest
 
 from mrs_client.geo import (
@@ -69,9 +71,11 @@ class TestPointInSphere:
 
     def test_point_on_boundary(self) -> None:
         center = Location(lat=0.0, lon=0.0)
-        sphere = Sphere(center=center, radius=111_000.0)  # ~1 degree at equator
-        point = Location(lat=1.0, lon=0.0)  # Exactly 1 degree north
-        # Should be on or near boundary
+        sphere = Sphere(center=center, radius=111_000.0)
+        # Convert meters to degrees latitude using the same spherical Earth model
+        # as haversine_distance, so this point lies on the boundary.
+        lat_delta_deg = (sphere.radius / 6_371_000) * (180 / math.pi)
+        point = Location(lat=lat_delta_deg, lon=0.0)
         assert point_in_sphere(point, sphere) is True
 
 
@@ -91,12 +95,16 @@ class TestSpheresIntersect:
         assert spheres_intersect(sphere1, sphere2) is True
 
     def test_touching_spheres(self) -> None:
-        # Two spheres that just touch
+        # Two spheres that just touch (distance == sum of radii).
         center1 = Location(lat=0.0, lon=0.0)
-        # Move center2 so distance equals sum of radii
-        center2 = Location(lat=0.0018, lon=0.0)  # About 200 meters apart
         sphere1 = Sphere(center=center1, radius=100.0)
+        sphere2 = Sphere(center=Location(lat=0.0, lon=0.0), radius=100.0)
+
+        # Convert 200m center separation to latitude degrees using same Earth model.
+        lat_delta_deg = ((sphere1.radius + sphere2.radius) / 6_371_000) * (180 / math.pi)
+        center2 = Location(lat=lat_delta_deg, lon=0.0)
         sphere2 = Sphere(center=center2, radius=100.0)
+
         assert spheres_intersect(sphere1, sphere2) is True
 
     def test_non_overlapping_spheres(self) -> None:

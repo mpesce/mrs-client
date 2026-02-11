@@ -5,7 +5,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import time
-from datetime import datetime
+from datetime import datetime, UTC
 from pathlib import Path
 from typing import Any
 
@@ -87,7 +87,7 @@ class AuthManager:
             id=f"{username}@{domain}",
             public_key=public_key.public_bytes_raw(),
             private_key=private_key.private_bytes_raw(),
-            key_id=f"key-{datetime.utcnow().strftime('%Y-%m')}",
+            key_id=f"key-{datetime.now(UTC).strftime('%Y-%m')}",
         )
 
         self._save_identity(identity)
@@ -272,6 +272,16 @@ def verify_signature(
 
         if not all([sig_input, signature_header, mrs_identity]):
             return False
+
+        # If a content digest header is present, verify it matches the provided body.
+        # This prevents signature reuse with tampered request bodies.
+        if content_digest is not None:
+            if body is None:
+                return False
+            expected_digest = hashlib.sha256(body).digest()
+            expected_content_digest = f"sha-256=:{base64.b64encode(expected_digest).decode()}:"
+            if content_digest != expected_content_digest:
+                return False
 
         # Parse signature input to extract components
         # Format: sig1=("@method" "@path" ...); keyid="..."; created=...; alg="ed25519"
