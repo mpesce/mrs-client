@@ -98,6 +98,9 @@ mrs identity show
 
 ## Registering Spaces
 
+`service_point` is strictly validated for safety. It must be a well-formed `https://` URI and must not include credentials, fragments, control characters, or whitespace.
+
+
 ```bash
 # Register a space with a service endpoint
 mrs register --lat -33.8568 --lon 151.2153 --radius 50 \
@@ -295,4 +298,4 @@ Mark D. Pesce (mpesce@gmail.com)
 ## Links
 
 - [GitHub Repository](https://github.com/mpesce/mrs-client)
-- [MRS Protocol Specification](MRS-SPEC-DRAFT.md)
+- [MRS Protocol Specification](https://github.com/mpesce/mrs-server/blob/main/MRS-SPEC-DRAFT.md)
