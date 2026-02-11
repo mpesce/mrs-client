@@ -30,6 +30,15 @@ Level 0 is a static JSON map of space→URI registrations at a well-known URL.
 }
 ```
 
+## Lint helper
+Validate a dataset before publishing:
+
+```bash
+python scripts/static-mrs-lint.py /path/to/mrs-static.json
+# strict mode (warnings fail build)
+python scripts/static-mrs-lint.py /path/to/mrs-static.json --strict
+```
+
 ## Query helper
 Use the included script:
 
