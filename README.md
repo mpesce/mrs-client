@@ -29,6 +29,8 @@ cd mrs-client
 
 For a short walkthrough, see [QUICKSTART.md](QUICKSTART.md).
 
+For static read-only maps (Level 0), see [`docs/STATIC_LEVEL0.md`](docs/STATIC_LEVEL0.md).
+
 ## Quick Start
 
 ### CLI Usage
